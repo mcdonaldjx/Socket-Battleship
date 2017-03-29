@@ -5,7 +5,7 @@
  * a. Program takes in command line arguments of a hostname and port number.
  * b. Program connects to a socket created by a EchoServer using the hostname and port number
  * c. Program sends out a READY signal to the socket
- * d. Program waits for a READY signal from the socket (sent by an BattleshipHost object)
+ * d. Program waits for a READY signal from the socket (sent by a BattleshipHost object)
  * e. Program asks player to place ships on board
  * f. Program either:
  * 	i. Sends a move to the other player over the socket
