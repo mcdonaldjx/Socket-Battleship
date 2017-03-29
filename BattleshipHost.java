@@ -18,7 +18,7 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-public class EchoServer {
+public class BattleshipHost { //Also known as EchoServer
 	static String ships[] = {"Battleship (6 spaces)","Carrier (5 spaces)","Destroyer (4 spaces)","Submarine (3 spaces)","Patrol (2 spaces)"}; //All ships available with their lengths
 	public static char board[][] = new char[10][10]; //Board
 	public static char fired[][] = new char[10][10]; //Spots that have been fired upon
