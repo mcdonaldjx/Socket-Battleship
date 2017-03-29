@@ -9,7 +9,7 @@
  * e. Program asks player to place ships on board
  * f. Program either:
  * 	i. Sends a move to the other player over the socket
- *  ii. Recieves a move from the other player over the socket
+ *  	ii. Recieves a move from the other player over the socket
  * g. Program sends/recieves a hit or miss over the socket
  * h. Program ends when either all ships have been destroyed or the battleship has been destroyed
  */
@@ -18,7 +18,7 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-public class EchoClient {
+public class BattleshipClient {
 	static String ships[] = {"Battleship (6 spaces)","Carrier (5 spaces)","Destroyer (4 spaces)","Submarine (3 spaces)","Patrol (2 spaces)"};
 	public static char board[][] = new char[10][10];
 	public static char fired[][] = new char[10][10];
