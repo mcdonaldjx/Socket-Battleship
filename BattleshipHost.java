@@ -5,11 +5,11 @@
  * a. Program takes in command line arguments of a hostname and port number.
  * b. Program creates to a socket created using the hostname and port number
  * c. Program sends out a READY signal to the socket
- * d. Program waits for a READY signal from the socket (sent by an EchoClient object)
+ * d. Program waits for a READY signal from the socket (sent by a BattleshipClient object)
  * e. Program asks player to place ships on board
  * f. Program either:
  * 	i. Sends a move to the other player over the socket
- *  ii. Recieves a move from the other player over the socket
+ *  	ii. Recieves a move from the other player over the socket
  * g. Program sends/recieves a hit or miss over the socket
  * h. Program ends when either all ships have been destroyed or the battleship has been destroyed
  */
