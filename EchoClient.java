@@ -1,3 +1,18 @@
+/* Programmers: Jared McDonald
+ *Class: CSC 435, Spring 2016
+ *Instructor: Dr. Cook
+ * Program Purpose:
+ * a. Program takes in command line arguments of a hostname and port number.
+ * b. Program connects to a socket created by a EchoServer using the hostname and port number
+ * c. Program sends out a READY signal to the socket
+ * d. Program waits for a READY signal from the socket (sent by an EchoServer object)
+ * e. Program asks player to place ships on board
+ * f. Program either:
+ * 	i. Sends a move to the other player over the socket
+ *  ii. Recieves a move from the other player over the socket
+ * g. Program sends/recieves a hit or miss over the socket
+ * h. Program ends when either all ships have been destroyed or the battleship has been destroyed
+ */
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -23,7 +38,7 @@ public class EchoClient {
 
 	public static void main(String[] args) throws Exception {
 		if(args.length != 2){
-			System.err.println("Usage: java EchoClient <hostname> <portNumber>");
+			System.err.println("Necessary command line arguments: <hostname> <portNumber>");
 			System.exit(1);
 		}
 		String hostName = args[0];
@@ -46,7 +61,6 @@ public class EchoClient {
 					else{
 						outSend.println("READY");
 					}
-					
 				}
 				fillBoard();
 				placement();
@@ -81,15 +95,14 @@ public class EchoClient {
 						TimeUnit.SECONDS.sleep(10);
 						outSend.println("TIMEOUT - EXPECTING A MOVE");
 
-					}
-					
-	
+					}	
 				//POINT A SENDING
 					//User Input is withing the userInput variable at this point
 					//The below function is the variable that is sent to the server
 					
 					System.out.println("Waiting to Recieve message...");
 				}
+				echoSocket.close();
 			}
 			catch(UnknownHostException e){
 				System.err.println("Don't know about host "+hostName);

@@ -1,99 +1,115 @@
+/* Programmers: Jared McDonald
+ *Class: CSC 435, Spring 2016
+ *Instructor: Dr. Cook
+ * Program Purpose:
+ * a. Program takes in command line arguments of a hostname and port number.
+ * b. Program creates to a socket created using the hostname and port number
+ * c. Program sends out a READY signal to the socket
+ * d. Program waits for a READY signal from the socket (sent by an EchoClient object)
+ * e. Program asks player to place ships on board
+ * f. Program either:
+ * 	i. Sends a move to the other player over the socket
+ *  ii. Recieves a move from the other player over the socket
+ * g. Program sends/recieves a hit or miss over the socket
+ * h. Program ends when either all ships have been destroyed or the battleship has been destroyed
+ */
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class EchoServer {
-	static String ships[] = {"Battleship (6 spaces)","Carrier (5 spaces)","Destroyer (4 spaces)","Submarine (3 spaces)","Patrol (2 spaces)"};
-	public static char board[][] = new char[10][10];
-	public static char fired[][] = new char[10][10];
-	static int shipsplaced = 0;
+	static String ships[] = {"Battleship (6 spaces)","Carrier (5 spaces)","Destroyer (4 spaces)","Submarine (3 spaces)","Patrol (2 spaces)"}; //All ships available with their lengths
+	public static char board[][] = new char[10][10]; //Board
+	public static char fired[][] = new char[10][10]; //Spots that have been fired upon
+	static int shipsplaced = 0; //How many ships have been placed so far
 	static Scanner sc = new Scanner(System.in);
-	static int battleshiphealth = 6;
-	static int carrierhealth = 5;
-	static int destroyerhealth = 4;
-	static int submarinehealth = 3;
-	static int patrolhealth = 2;
-	static int read = 0;
-	static int row = 0;
-	static String ship = null;
-	static int col = 0;
-	static int length = 0;
-	static char mode = ' ';
+	static int battleshiphealth = 6; //How many hits the battleship can take
+	static int carrierhealth = 5; //How many hits the carrier can take
+	static int destroyerhealth = 4; //How many hits the destroyer can take
+	static int submarinehealth = 3; //How many hits the submarine can take
+	static int patrolhealth = 2; //How many hits the patroller can take
+	static int read = 0; //Reads input from sc scanner
+	static int row = 0; //Current row
+	static String ship = null; //Ship name
+	static int col = 0; //Current column
+	static int length = 0; //Length of ship
+	static char mode = ' '; //Place ship horizontal or vertical
 
     public static void main(String args[]) throws Exception{
     	if(args.length != 1){
-    		System.err.println("Usage: java EchoServer <port number>");
+    		System.err.println("Necessary command line argument: <port number>");
     		System.exit(1);
     	}
     	int portNumber = Integer.parseInt(args[0]);
-	PrintWriter out = null;
+    	PrintWriter out = null;
     	//Recieve Mode
     	try{
-    		ServerSocket serverSocket = new ServerSocket(portNumber);
-    		Socket clientSocket = serverSocket.accept();
-    		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-    		out = new PrintWriter(clientSocket.getOutputStream(), true);
-		String inputLine;
-		out.println("READY");	
-		System.out.println("Waiting for READY signal....");
-		while((inputLine = in.readLine()) != null){
-			
-			if(inputLine.contains("READY")){
-				System.out.println("READY Recieved");
-				break;
+    		ServerSocket serverSocket = new ServerSocket(portNumber); //Create a new ServerSocket using the portnumber
+    		Socket clientSocket = serverSocket.accept(); //Create a new Socket
+    		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //Reads output of the Socket
+    		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); //Reads input from the Scanner
+    		out = new PrintWriter(clientSocket.getOutputStream(), true); //Output to the socket
+			String inputLine;
+			out.println("READY");	//Send Ready signal to the server
+			System.out.println("Waiting for READY signal...."); //Wait to recieve a Ready back
+			while((inputLine = in.readLine()) != null){ //While Ready hasnt been recieved
+				if(inputLine.contains("READY")){ //If Ready is in the output
+					System.out.println("READY Recieved");
+					break;
+				}
+				else{
+					out.println("READY"); //Keep sending out that you're ready
+				}
 			}
-			else{
-				out.println("READY");
-			}
-		}
-		fillBoard();
-		placement();
-		shipsplaced = 5;
-    		System.out.print("Type Message FORMAT( MOVE {A-J} {1-10} >>> ");
-		printFired();
-    		while((inputLine = stdIn.readLine()) != null){
-			if(transmit() == 1){
-				out.println(inputLine);
-				System.out.println("Sent "+inputLine+" successfully.");
-				//Listen for hit/miss
-				inputLine = in.readLine();
-				System.out.println("\t"+inputLine);
-			}
-			else{
-				System.out.println("Tried to send "+inputLine+" but it failed.");
-				TimeUnit.SECONDS.sleep(10);
-				out.println("TIMEOUT - EXPECTING A MOVE");
-			}
-			
-			System.out.println("Waiting to Recieve message...");
-			inputLine = in.readLine();
-    			System.out.println("\t"+inputLine);
-			if(inputLine.contains("BATTLESHIP")){ //Win condition
-				System.out.println("You Win!");
-				System.exit(0);
-			}
-			else if(inputLine.contains("MOVE ")){
-				shot(inputLine,out);
-			}
-    			System.out.print("Type Message FORMAT( MOVE {A-J} {1-10} >>> ");
+			fillBoard(); //Fill the playing board of empty spaces
+			placement(); //Place ships
+			shipsplaced = 5;
+	    	System.out.print("Type Message FORMAT( MOVE {A-J} {1-10} >>> ");
 			printFired();
-    			
-    		}
+	    		while((inputLine = stdIn.readLine()) != null){
+				if(transmit() == 1){
+					out.println(inputLine);
+					System.out.println("Sent "+inputLine+" successfully.");
+					//Listen for hit/miss
+					inputLine = in.readLine();
+					System.out.println("\t"+inputLine);
+				}
+				else{
+					System.out.println("Tried to send "+inputLine+" but it failed.");
+					TimeUnit.SECONDS.sleep(10);
+					out.println("TIMEOUT - EXPECTING A MOVE");
+				}
+				
+				System.out.println("Waiting to Recieve message...");
+				inputLine = in.readLine();
+	    			System.out.println("\t"+inputLine);
+				if(inputLine.contains("BATTLESHIP")){ //Win condition
+					System.out.println("You Win!");
+					System.exit(0);
+				}
+				else if(inputLine.contains("MOVE ")){
+					shot(inputLine,out);
+				}
+	    			System.out.print("Type Message FORMAT( MOVE {A-J} {1-10} >>> ");
+				printFired();
+	    			
+	    		}
+	    		serverSocket.close();
     	}
     	catch(IOException e){
     		System.out.println("Exception caught when trying to listen on port "+portNumber+" or listening for a connection");
     		System.out.println(e.getMessage());
     	}
     }
-	public static int transmit(){
+	public static int transmit(){ //Percent chance of actually sending the message
 		int chance = 1 + (int)(Math.random() * ((10 - 1) + 1));
 		if(chance > 1){
 			return 1;
 		}
 		else{
-			return 0;
+			//return 0; //Was 0 for assignment purposes
+			return 1;
 		}
 	}
 	public static void updateFired(String str){ //RECIEVED HIT
