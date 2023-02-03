@@ -25,4 +25,4 @@ Java compiler or Java IDE, a network connection, a known open port
 
 ## Authors
 
-* **Jared McDonald** - *Initial work* - [Jaredx610](https://github.com/Jaredx610)
+* **Jared McDonald** - *Initial work* - [mcdonaldjx](https://github.com/mcdonaldjx)
